@@ -1,6 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.seyana.systemhelpercheck" android:versionCode="1" android:versionName="1.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.seyana.systemhelpercheck" android:versionCode="2" android:versionName="1.1.0">
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
-    <queries><package android:name="com.mobiletools.systemhelper" /></queries>
+    <queries>
+        <package android:name="com.mobiletools.systemhelper" />
+        <package android:name="com.miui.dmregservice" />
+    </queries>
     <application android:label="组件检查" android:icon="@drawable/ic_launcher" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:supportsRtl="true" android:usesCleartextTraffic="false">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 /** Queries current-user registration; never mistakes a retained system APK for installation. */
 public final class PackageProbe {
     public static final String TARGET = "com.mobiletools.systemhelper";
+    public static final String REG_SERVICE = "com.miui.dmregservice";
     private PackageProbe() {}
     public static final class Result {
         public final int state;

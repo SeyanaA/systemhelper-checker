@@ -3,6 +3,8 @@ package com.seyana.systemhelpercheck.test;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.SharedPreferences;
+import com.seyana.systemhelpercheck.CheckHistory;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import com.seyana.systemhelpercheck.PackageProbe;
@@ -23,7 +25,22 @@ public final class ProbeInstrumentation extends Instrumentation {
             int expected = Integer.parseInt(arguments.getString("expectedTarget", "0"));
             PackageProbe.Result actual = PackageProbe.check(target, PackageProbe.TARGET);
             require(actual.state == expected, "target state=" + actual.state + " expected=" + expected);
-            result.putString("result", "PASS: installed, missing, query failure, actual target=" + actual.state);
+            int expectedReg = Integer.parseInt(arguments.getString("expectedRegService", "0"));
+            PackageProbe.Result reg = PackageProbe.check(target, PackageProbe.REG_SERVICE);
+            require(reg.state == expectedReg, "RegService state=" + reg.state + " expected=" + expectedReg);
+            SharedPreferences fixture = target.getSharedPreferences("test_history_fixture", Context.MODE_PRIVATE);
+            try {
+                require(fixture.edit().clear().putLong("last_absent", 123L).commit(), "seed legacy history");
+                CheckHistory history = new CheckHistory(fixture);
+                require(history.lastAbsent(PackageProbe.TARGET) == 123L, "retain v1.0 history");
+                require(history.lastAbsent(PackageProbe.REG_SERVICE) == 0L, "no legacy history on RegService");
+                history.recordAbsent(PackageProbe.REG_SERVICE, 456L);
+                require(history.lastAbsent(PackageProbe.TARGET) == 123L, "RegService must not overwrite SystemHelper");
+                history.recordAbsent(PackageProbe.TARGET, 789L);
+                require(history.lastAbsent(PackageProbe.REG_SERVICE) == 456L, "SystemHelper must not overwrite RegService");
+                require(history.lastAbsent(PackageProbe.TARGET) == 789L, "store new SystemHelper baseline");
+            } finally { fixture.edit().clear().commit(); }
+            result.putString("result", "PASS: installed, missing, query failure, SystemHelper=" + actual.state + ", RegService=" + reg.state + "; legacy history and per-package isolation passed");
             finish(-1, result);
         } catch (Throwable failure) {
             result.putString("failure", failure.toString());

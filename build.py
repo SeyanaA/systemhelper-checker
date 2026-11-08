@@ -39,7 +39,7 @@ def build(name, source, manifest, test=False):
         z.write(dex/'classes.dex','classes.dex')
     aligned=work/'aligned.apk'
     run(TOOLS/'zipalign','-f','-p','4',unsigned,aligned)
-    output=DIST/('checker-tests.apk' if test else 'SystemHelper-Checker-v1.0.apk')
+    output=DIST/('checker-tests.apk' if test else 'Component-Checker-v1.1.0.apk')
     signer=[JDK/'bin/java','-jar',TOOLS/'lib/apksigner.jar']
     run(*signer,'sign','--ks',key,'--ks-key-alias','checker','--ks-pass','file:'+str(password),'--out',output,aligned)
     run(*signer,'verify','--verbose',output)
