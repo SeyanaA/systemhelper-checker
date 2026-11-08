@@ -1,0 +1,6 @@
+signing/
+build/
+dist/
+release-assets/
+.DS_Store
+__pycache__/
